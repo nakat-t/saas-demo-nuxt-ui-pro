@@ -59,13 +59,14 @@ const items = computed(() => [{
               external
             />
 
-            <UButton
+            <!-- Disable sign up in this demo -->
+            <!-- <UButton
               label="Sign up"
               color="neutral"
               trailing-icon="i-lucide-arrow-right"
               class="hidden lg:inline-flex"
               to="/signup"
-            />
+            /> -->
           </template>
 
           <!-- When logged in - mobile view -->
@@ -124,12 +125,13 @@ const items = computed(() => [{
               class="mb-3"
               external
             />
-            <UButton
+            <!-- Disable sign up in this demo -->
+            <!-- <UButton
               label="Sign up"
               color="neutral"
               to="/signup"
               block
-            />
+            /> -->
           </template>
           <template v-else>
             <div class="flex items-center justify-between mb-3 p-2 bg-gray-100 dark:bg-gray-800 rounded">
