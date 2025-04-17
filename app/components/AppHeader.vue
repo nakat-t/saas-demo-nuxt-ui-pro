@@ -1,5 +1,11 @@
 <script setup lang="ts">
 const route = useRoute()
+const { user } = useUserSession()
+
+// Display name (preferred_username if available, otherwise email)
+const displayName = computed(() => {
+  return user.value?.preferred_username || user.value?.email || ''
+})
 
 const items = computed(() => [{
   label: 'Docs',
@@ -31,29 +37,69 @@ const items = computed(() => [{
     <template #right>
       <UColorModeButton />
 
-      <UButton
-        icon="i-lucide-log-in"
-        color="neutral"
-        variant="ghost"
-        to="/login"
-        class="lg:hidden"
-      />
+      <AuthState>
+        <template #default="{ loggedIn, clear }">
+          <!-- When not logged in - mobile view -->
+          <template v-if="!loggedIn">
+            <UButton
+              icon="i-lucide-log-in"
+              color="neutral"
+              variant="ghost"
+              to="/auth/cognito"
+              class="lg:hidden"
+              external
+            />
 
-      <UButton
-        label="Sign in"
-        color="neutral"
-        variant="ghost"
-        to="/login"
-        class="hidden lg:inline-flex"
-      />
+            <UButton
+              label="Sign in"
+              color="neutral"
+              variant="ghost"
+              to="/auth/cognito"
+              class="hidden lg:inline-flex"
+              external
+            />
 
-      <UButton
-        label="Sign up"
-        color="neutral"
-        trailing-icon="i-lucide-arrow-right"
-        class="hidden lg:inline-flex"
-        to="/signup"
-      />
+            <UButton
+              label="Sign up"
+              color="neutral"
+              trailing-icon="i-lucide-arrow-right"
+              class="hidden lg:inline-flex"
+              to="/signup"
+            />
+          </template>
+
+          <!-- When logged in - mobile view -->
+          <template v-else>
+            <UButton
+              icon="i-lucide-log-out"
+              color="neutral"
+              variant="ghost"
+              class="lg:hidden"
+              @click="async () => { await clear(); await navigateTo('/'); }"
+            />
+
+            <div class="hidden lg:flex items-center gap-2">
+              <UBadge
+                color="neutral"
+                class="px-2 py-1"
+              >
+                {{ displayName }}
+              </UBadge>
+              <UButton
+                label="Sign out"
+                color="neutral"
+                variant="ghost"
+                @click="async () => { await clear(); await navigateTo('/'); }"
+              />
+            </div>
+          </template>
+        </template>
+        <template #placeholder>
+          <div class="flex items-center justify-between mb-3 p-2 bg-gray-100 dark:bg-gray-800 rounded">
+            <span class="text-sm">Loading...</span>
+          </div>
+        </template>
+      </AuthState>
     </template>
 
     <template #body>
@@ -65,20 +111,45 @@ const items = computed(() => [{
 
       <USeparator class="my-6" />
 
-      <UButton
-        label="Sign in"
-        color="neutral"
-        variant="subtle"
-        to="/login"
-        block
-        class="mb-3"
-      />
-      <UButton
-        label="Sign up"
-        color="neutral"
-        to="/signup"
-        block
-      />
+      <!-- Responsive menu footer buttons -->
+      <AuthState>
+        <template #default="{ loggedIn, clear }">
+          <template v-if="!loggedIn">
+            <UButton
+              label="Sign in"
+              color="neutral"
+              variant="subtle"
+              to="/auth/cognito"
+              block
+              class="mb-3"
+              external
+            />
+            <UButton
+              label="Sign up"
+              color="neutral"
+              to="/signup"
+              block
+            />
+          </template>
+          <template v-else>
+            <div class="flex items-center justify-between mb-3 p-2 bg-gray-100 dark:bg-gray-800 rounded">
+              <span class="text-sm">{{ displayName }}</span>
+            </div>
+            <UButton
+              label="Sign out"
+              color="neutral"
+              variant="subtle"
+              block
+              @click="async () => { await clear(); await navigateTo('/'); }"
+            />
+          </template>
+        </template>
+        <template #placeholder>
+          <div class="flex items-center justify-between mb-3 p-2 bg-gray-100 dark:bg-gray-800 rounded">
+            <span class="text-sm">Loading...</span>
+          </div>
+        </template>
+      </AuthState>
     </template>
   </UHeader>
 </template>

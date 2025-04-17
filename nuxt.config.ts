@@ -7,7 +7,7 @@ export default defineNuxtConfig({
     '@nuxt/content',
     '@vueuse/nuxt',
     'nuxt-og-image',
-    'nuxt-auth-utils',
+    'nuxt-auth-utils'
   ],
 
   devtools: {
@@ -15,6 +15,22 @@ export default defineNuxtConfig({
   },
 
   css: ['~/assets/css/main.css'],
+
+  runtimeConfig: {
+    // AWS Cognito OAuth settings.
+    // Set the actual value in the environment variable NUXT_OAUTH_COGNITO_XXX.
+    oauth: {
+      cognito: {
+        clientId: '',
+        clientSecret: '',
+        userPoolId: '',
+        region: '',
+        // scope: [] as string[],
+        // authorizationParams: {'': ''} as Record<string, string>,
+        redirectURL: ''
+      }
+    }
+  },
 
   routeRules: {
     '/docs': { redirect: '/docs/getting-started', prerender: false }
