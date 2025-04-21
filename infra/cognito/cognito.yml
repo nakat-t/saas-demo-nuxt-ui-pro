@@ -1,19 +1,19 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: AWS Cognito User Pool, App Client, Domain, Branding Designer UI を定義するCloudFormationテンプレート
+Description: CloudFormation template that defines AWS Cognito UserPool, Client, Domain, and Managed Login Branding.
 
 Parameters:
   ProjectName:
       Type: String
-      Description: "プロジェクト名（例: saas-demo）"
+      Description: "Project name (e.g., saas-demo)"
   Environment:
       Type: String
-      Description: "環境名（例: dev, stg, prd）"
+      Description: "Environment name (e.g., dev, stg, prd)"
   CallbackURLs:
       Type: CommaDelimitedList
-      Description: "OAuth認証後のリダイレクトURIリスト（カンマ区切り）"
+      Description: "List of redirect URIs after OAuth authentication (comma-separated)"
   LogoutURLs:
       Type: CommaDelimitedList
-      Description: "ログアウト後のリダイレクトURIリスト（カンマ区切り）"
+      Description: "List of redirect URIs after logout (comma-separated)"
 
 Resources:
   CognitoUserPool:
@@ -415,11 +415,11 @@ Resources:
 
 Outputs:
   UserPoolId:
-    Description: 作成されたUser PoolのID
+    Description: ID of the created User Pool
     Value: !Ref CognitoUserPool
   UserPoolClientId:
-    Description: 作成されたUser Pool ClientのID
+    Description: ID of the created User Pool Client
     Value: !Ref CognitoUserPoolClient
   UserPoolDomainEndpoint:
-    Description: 作成されたUser Poolのドメインエンドポイント
+    Description: Domain endpoint of the created user pool
     Value: !GetAtt CognitoUserPoolDomain.CloudFrontDistribution
