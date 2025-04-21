@@ -1,14 +1,10 @@
-# Cognitoリソースデプロイ手順
+# Cognito Resource Deployment Procedure
 
-このディレクトリには、AWS Cognito User Pool, App Client, Domain, ブランディングデザイナーUIをCloudFormationでデプロイするためのテンプレート（cognito.yml）が含まれています。
+This directory contains a CloudFormation template (cognito.yml) for deploying AWS Cognito User Pool, App Client, Domain, and the branding designer UI.
 
----
+## Deployment Steps
 
-## デプロイ手順
-
-1. AWS CLIでCloudFormationスタックを作成または更新します。
-
-例:
+Example:
 ```sh
 aws cloudformation deploy \
   --template-file cognito.yml \
@@ -16,32 +12,18 @@ aws cloudformation deploy \
   --parameter-overrides \
       ProjectName=saas-demo \
       Environment=dev \
-      CallbackURLs='http://localhost:3000/auth/cognito' \
-      LogoutURLs='http://localhost:3000/'
+      CallbackURLs='http://YOUR_DOMAIN/auth/cognito,http://YOUR_DOMAIN/auth/cognito_signup' \
+      LogoutURLs='http://YOUR_DOMAIN/'
 ```
 
-- CallbackURLs, LogoutURLsはカンマ区切りで複数指定可能です。
+- Multiple CallbackURLs and LogoutURLs can be specified, separated by commas.
+- `YOUR_DOMAIN` specifies the domain where you deploy production, or `localhost:3000` during development.
 
-2. デプロイ後、AWSマネジメントコンソールで以下を確認してください。
-   - User Pool, App Client, Domain, UIカスタマイズが作成されていること
-   - マネージドログインUIが有効化されていること
-   - リダイレクトURIが正しく設定されていること
+## Parameter Examples
 
----
-
-## パラメータ例
-
-| パラメータ名   | 例                                    | 説明                       |
-|:--------------|:--------------------------------------|:---------------------------|
-| ProjectName   | saas-demo                             | プロジェクト名             |
-| Environment   | dev                                   | 環境名（dev, stg, prd等）  |
-| CallbackURLs  | http://localhost:3000/auth/cognito    | OAuth認証後のリダイレクトURI |
-| LogoutURLs    | http://localhost:3000/                | ログアウト後のリダイレクトURI |
-
----
-
-## 注意事項
-
-- signup（自己登録）は現状無効です（AdminCreateUserOnly: true）。
-- テストユーザー登録・ログインは後続タスクで実施してください。
-- 詳細なカスタマイズや環境ごとのパラメータは必要に応じて調整してください。
+| Parameter Name | Description                                                                 |
+|:---------------|:----------------------------------------------------------------------------|
+| ProjectName    | Project name                                                                |
+| Environment    | Environment name (e.g., dev, stg, prd)                                      |
+| CallbackURLs   | Redirect URI after OAuth authentication (multiple URIs can be specified, comma-separated) |
+| LogoutURLs     | Redirect URI after logout (multiple URIs can be specified, comma-separated) |

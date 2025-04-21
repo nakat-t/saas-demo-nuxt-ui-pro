@@ -59,14 +59,14 @@ const items = computed(() => [{
               external
             />
 
-            <!-- Disable sign up in this demo -->
-            <!-- <UButton
+            <UButton
               label="Sign up"
               color="neutral"
               trailing-icon="i-lucide-arrow-right"
               class="hidden lg:inline-flex"
-              to="/signup"
-            /> -->
+              to="/auth/cognito_signup"
+              external
+            />
           </template>
 
           <!-- When logged in - mobile view -->
@@ -125,13 +125,13 @@ const items = computed(() => [{
               class="mb-3"
               external
             />
-            <!-- Disable sign up in this demo -->
-            <!-- <UButton
+            <UButton
               label="Sign up"
               color="neutral"
-              to="/signup"
+              to="/auth/cognito_signup"
               block
-            /> -->
+              external
+            />
           </template>
           <template v-else>
             <div class="flex items-center justify-between mb-3 p-2 bg-gray-100 dark:bg-gray-800 rounded">

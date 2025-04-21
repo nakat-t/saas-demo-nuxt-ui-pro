@@ -1,24 +1,25 @@
 export default defineOAuthCognitoEventHandler({
-  // Empty config or only override specific values if needed
-  // The default configuration from useRuntimeConfig().oauth.cognito will be used
-  config: {},
+  config: {
+    // scope cannot be set in runtimeConfig. Therefore, specify it here.
+    scope: process.env.NUXT_OAUTH_COGNITO_SCOPE?.split(',') || []
+  },
 
-  // onSuccess receives user information directly from userinfo endpoint
-  async onSuccess(event, { user /* , tokens */ }) {
-    // User already contains information from userinfo endpoint
+  async onSuccess(event, { user, tokens }) {
+    // [Important]
+    // Since we encrypt and store session data in cookies, we're constrained by the 4096-byte cookie size limit.
+    // Store only essential information.
     await setUserSession(event, {
       user: {
-        // Keep only necessary user information to avoid session size limits
-        preferred_username: user.preferred_username,
-        email: user.email,
-        email_verified: user.email_verified
+        preferred_username: user?.preferred_username,
+        email: user?.email
       },
-      loggedInAt: new Date().toISOString()
+      secure: {
+        access_token: tokens?.access_token
+      }
     })
     return sendRedirect(event, '/')
   },
 
-  // Optional error handling
   onError(event, error) {
     console.error('Cognito OAuth error:', error)
     return sendRedirect(event, '/')

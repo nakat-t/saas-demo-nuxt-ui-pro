@@ -40,7 +40,17 @@ Resources:
           - Name: verified_email
             Priority: 1
       AdminCreateUserConfig:
-        AllowAdminCreateUserOnly: true # signupは次Issueで対応
+        AllowAdminCreateUserOnly: false
+
+  CognitoResourceServer:
+    Type: AWS::Cognito::UserPoolResourceServer
+    Properties:
+      UserPoolId: !Ref CognitoUserPool
+      Identifier: !Sub "${ProjectName}-${Environment}"
+      Name: !Sub "${ProjectName}-${Environment}-userpoolresourceserver"
+      Scopes:
+        - ScopeName: basic
+          ScopeDescription: "Basic access to web services"
 
   CognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
@@ -74,7 +84,7 @@ Resources:
         - openid
         - email
         - profile
-        - aws.cognito.signin.user.admin
+        - !Sub "${ProjectName}-${Environment}/basic"
       AllowedOAuthFlows:
         - code
       SupportedIdentityProviders:
