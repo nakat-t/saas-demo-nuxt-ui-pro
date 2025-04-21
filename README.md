@@ -1,115 +1,100 @@
-![nuxt-ui-saas-social-card](https://github.com/nuxt-ui-pro/saas/assets/739984/50bf4ddd-c4d5-47e5-a09e-0f699513dfb5)
+# Demo with Nuxt UI Pro SaaS template and AWS Cognito Authentication
 
-# Nuxt UI Pro - SaaS template
+This repository demonstrates a working sign-in/sign-up functionality added to the [Nuxt UI Pro - SaaS template](https://github.com/nuxt-ui-pro/saas) using AWS Cognito User Pools and its managed login UI. Authentication is handled by [nuxt-auth-utils](https://github.com/atinux/nuxt-auth-utils).
 
-[![Nuxt UI Pro](https://img.shields.io/badge/Made%20with-Nuxt%20UI%20Pro-00DC82?logo=nuxt.js&labelColor=020420)](https://ui.nuxt.com/pro)
+## Important Note
 
-- [Live demo](https://saas-template.nuxt.dev/)
-- [Play on Stackblitz](https://stackblitz.com/github/nuxt-ui-pro/saas)
-- [Documentation](https://ui.nuxt.com/pro/getting-started)
+Nuxt UI Pro is a paid product. You need a valid [Nuxt UI Pro license](https://ui.nuxt.com/pro/pricing) to run this demo.
 
-[![Deploy to NuxtHub](https://hub.nuxt.com/button.svg)](https://hub.nuxt.com/new?repo=nuxt-ui-pro/saas)
+## How to Run the Demo
 
-## Quick Start
+1.  **Deploy the AWS CloudFormation template** to your AWS account.
 
-```bash [Terminal]
-npx nuxi init -t github:nuxt-ui-pro/saas
-```
+    Example:
 
-## Setup
+    ```sh
+    aws cloudformation deploy \
+      --template-file infra/cognito/cognito.yml \
+      --stack-name saas-demo-cognito-dev \
+      --parameter-overrides \
+          ProjectName=saas-demo \
+          Environment=dev \
+          CallbackURLs='http://YOUR_DOMAIN/auth/cognito,http://YOUR_DOMAIN/auth/cognito_signup' \
+          LogoutURLs='http://YOUR_DOMAIN/'
+    ```
 
-Make sure to install the dependencies:
+    > [!NOTE]
+    > Replace `YOUR_DOMAIN` with the domain where you deploy the application in production, or use `localhost:3000` during development.
 
-```bash
-# npm
-npm install
+2.  **Create a `.env` file** in the root directory with the following content, replacing the placeholder values with your actual Cognito details obtained from the CloudFormation stack outputs and your Nuxt UI Pro license:
 
-# pnpm
-pnpm install
+    ```dotenv
+    # Production license for @nuxt/ui-pro, get one at https://ui.nuxt.com/pro/purchase
+    NUXT_UI_PRO_LICENSE=your_license_code
 
-# yarn
-yarn install
+    # AWS Cognito App Client ID
+    NUXT_OAUTH_COGNITO_CLIENT_ID=your_client_id
+    # AWS Cognito App Client Secret
+    NUXT_OAUTH_COGNITO_CLIENT_SECRET=your_client_secret
+    # AWS Cognito User Pool ID
+    NUXT_OAUTH_COGNITO_USER_POOL_ID=your_user_pool_id
+    # AWS Cognito Region
+    NUXT_OAUTH_COGNITO_REGION=your_cognito_region
+    # AWS Cognito Scope (comma-separated)
+    NUXT_OAUTH_COGNITO_SCOPE=openid,email,profile,saas-demo-dev/basic
+    # Redirect URL for signin
+    NUXT_OAUTH_COGNITO_REDIRECT_URL=http://YOUR_DOMAIN/auth/cognito
+    # Redirect URL for signup
+    NUXT_OAUTH_COGNITO_SIGNUP_REDIRECT_URL=http://YOUR_DOMAIN/auth/cognito_signup
 
-# bun
-bun install
-```
+    # nuxt-auth-utils password for encoding user sessions
+    NUXT_SESSION_PASSWORD=password-with-at-least-32-characters
+    ```
+    > [!NOTE]
+    > Ensure `NUXT_SESSION_PASSWORD` is a strong, random string of at least 32 characters.
 
-## Development Server
+3.  **Install dependencies and run the development server:**
 
-Start the development server on `http://localhost:3000`:
+    ```sh
+    pnpm install
+    pnpm dev
+    ```
 
-```bash
-# npm
-npm run dev
+4.  **Access the application** at http://localhost:3000/.
 
-# pnpm
-pnpm run dev
+## How It Works
 
-# yarn
-yarn dev
+-   The sign-in and sign-up features utilize AWS Cognito User Pools and the managed login UI.
+-   Authentication is handled by [nuxt-auth-utils](https://github.com/atinux/nuxt-auth-utils).
+-   When you click **[Sign in]**, the authentication flow is as follows:
 
-# bun
-bun run dev
-```
+    ```mermaid
+    sequenceDiagram
+        participant Browser
+        participant Server
+        participant Cognito
 
-## Production
+        Browser->>Server: GET /auth/cognito
+        Server->>Browser: 302 Redirect (to Cognito Login)
+        Browser->>Cognito: Navigate to Managed Login UI
+        Browser->>Cognito: User signs in
+        Cognito->>Browser: 302 Redirect (with auth code)
+        Browser->>Server: GET /auth/cognito?code=...
+        Server->>Cognito: POST /oauth2/token (Get Token)
+        Cognito->>Server: Token Response
+        Server->>Server: Set user session
+        Server->>Browser: Sign in successful, redirect to home
+    ```
 
-Build the application for production:
+-   The **[Sign up]** button uses the AWS Cognito [signup endpoint](https://docs.aws.amazon.com/cognito/latest/developerguide/managed-login-endpoints.html). The basic flow is similar to the sign-in process, directing the user to the Cognito hosted UI for registration.
 
-```bash
-# npm
-npm run build
+## Note on original `login.vue` and `signup.vue` pages
 
-# pnpm
-pnpm run build
+The original `login.vue` and `signup.vue` pages from the Nuxt UI Pro SaaS template are **not used** in this demo, as authentication is handled entirely by the AWS Cognito managed login UI.
 
-# yarn
-yarn build
+## References
 
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
-
-## Nuxt Studio integration
-
-Studio is an intuitive CMS interface to edit your Nuxt Content websites.
-
-It take advantage of the Preview API included in Nuxt Content to propose the best editing experience for your content files. Editors can benefit from a user-friendly interface to edit their Markdown, YAML or JSON files.
-
-You can import your project on the platform without any extra setup.
-
-However to enable the live preview on the platform, you just need to activate studio in the content configuration of your `nuxt.config.ts` file.
-
-```ts [nuxt.config.ts]
-export default defineNuxtConfig({
-  content: {
-    preview: {
-      api: 'https://api.nuxt.studio'
-    }
-  }
-})
-```
-
-Read more on [Nuxt Studio docs](https://content.nuxt.com/studio/setup).
-
-## Renovate integration
-
-Install [Renovate GitHub app](https://github.com/apps/renovate/installations/select_target) on your repository and you are good to go.
+-   [Nuxt UI Pro - SaaS template](https://github.com/nuxt-ui-pro/saas)
+-   [nuxt-auth-utils](https://github.com/atinux/nuxt-auth-utils)
+-   [AWS Cognito Developer Guide](https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html)
+-   [AWS User pool endpoints and managed login reference](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-userpools-server-contract-reference.html)
